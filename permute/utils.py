@@ -11,7 +11,7 @@ from scipy.stats import binom, hypergeom
 from cryptorandom.cryptorandom import SHA256
 from cryptorandom.sample import random_sample, random_permutation
 
-def binom_conf_interval(n, x, cl=0.975, alternative="two-sided", p=None,
+def binom_conf_interval(n, x, cl=0.975, alternative="two-sided", p=None, method="clopper-pearson"
                         **kwargs):
     """
     Compute a confidence interval for a binomial p, the probability of success in each trial.
@@ -28,6 +28,9 @@ def binom_conf_interval(n, x, cl=0.975, alternative="two-sided", p=None,
         Indicates the alternative hypothesis.
     p : float in (0, 1)
         Starting point in search for confidence bounds for probability of success in each trial.
+    method : {"clopper-pearson", "sterne", "wang"}
+        Indicates the computation method.
+        
     kwargs : dict
         Key word arguments
 
@@ -47,14 +50,17 @@ def binom_conf_interval(n, x, cl=0.975, alternative="two-sided", p=None,
         Maximum number of iterations.
     """
     assert alternative in ("two-sided", "lower", "upper")
+    if method not in ("clopper-pearson", "sterne", "wang"):
+        raise ValueError("Invalid Method")
 
     if p is None:
         p = x / n
     ci_low = 0.0
     ci_upp = 1.0
 
-    if alternative == 'two-sided':
-        cl = 1 - (1 - cl) / 2
+    if method == "clopper-pearson":
+        if alternative == 'two-sided':
+            cl = 1 - (1 - cl) / 2
 
     if alternative != "upper" and x > 0:
         f = lambda q: cl - binom.cdf(x - 1, n, q)
