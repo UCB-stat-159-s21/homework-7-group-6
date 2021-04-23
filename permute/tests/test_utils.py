@@ -74,6 +74,13 @@ def test_hypergeom_conf_interval():
     np.testing.assert_equal(res6, expected3)
 
 
+def test_hypergeom_conf_interval_badinput():
+    with pytest.raises(ValueError):
+        hypergeom_conf_interval(10, 3, 20, alternative="upper", G = 30)
+    with pytest.raises(ValueError):
+        hypergeom_conf_interval(10, 3, 20, alternative="upper", G = 1)
+        
+
 def test_hypergeometric():
     np.testing.assert_almost_equal(hypergeometric(4, 10, 5, 6, 'greater'), 
                         1-hypergeom.cdf(3, 10, 5, 6))
